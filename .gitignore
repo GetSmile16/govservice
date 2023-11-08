@@ -1,5 +1,6 @@
 todolist-backend/HELP.md
 target/
+logs
 !**/src/main/**/target/
 !**/src/test/**/target/
 
