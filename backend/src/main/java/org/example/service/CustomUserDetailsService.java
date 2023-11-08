@@ -19,7 +19,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final Logger log = LoggerFactory.getLogger(UserService.class);
     private final MessageSource messageSource;
 
-
     @Autowired
     public CustomUserDetailsService(UserRepository userRepository, MessageSource messageSource) {
         this.userRepository = userRepository;

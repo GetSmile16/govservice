@@ -1,6 +1,5 @@
 package org.example.service;
 
-import jakarta.transaction.Transactional;
 import org.example.dto.UserIdDto;
 import org.example.dto.UserInfoDto;
 import org.example.exception.UserIsExist;
@@ -32,12 +31,6 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
         this.encoder = passwordEncoder;
         this.messageSource = messageSource;
-    }
-
-    @Override
-    @Transactional
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
     }
 
     @Override
