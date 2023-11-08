@@ -1,8 +1,11 @@
 package org.example.dto;
 
-public class AuthRequestDto {
+import jakarta.validation.constraints.NotBlank;
 
+public class AuthRequestDto {
+    @NotBlank
     private String username;
+    @NotBlank
     private String password;
 
     public AuthRequestDto() {

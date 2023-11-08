@@ -1,11 +1,11 @@
 package org.example.service;
 
+import jakarta.validation.Valid;
 import org.example.dto.UserIdDto;
 import org.example.dto.UserInfoDto;
-import org.example.model.User;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 public interface UserService {
-    User getUserByEmail(String email);
-
-    UserIdDto createUser(UserInfoDto userInfo);
+    UserIdDto createUser(@Valid UserInfoDto userInfo);
 }
