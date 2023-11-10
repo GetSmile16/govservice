@@ -52,9 +52,9 @@ public class UserServiceImpl implements UserService {
         roles.add(Role.USER);
 
         user.setRoles(roles);
-        userRepository.save(user);
+        user = userRepository.save(user);
         log.info("User with username \"" + user.getUsername() + "\" created");
 
-        return new UserIdDto(userRepository.save(user).getId());
+        return new UserIdDto(user.getId());
     }
 }

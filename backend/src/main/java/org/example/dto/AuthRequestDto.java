@@ -1,11 +1,14 @@
 package org.example.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class AuthRequestDto {
     @NotBlank
     private String username;
-    @NotBlank
+    @NotNull(message = "Password must be between 4 to 15 characters")
+    @Size(min = 4, max = 15)
     private String password;
 
     public AuthRequestDto() {
