@@ -38,7 +38,7 @@ class UserServiceTest {
 
     @Test
     void createUser_userIsNotExist_savesUser() {
-        UserInfoDto userInfo = new UserInfoDto("test@example.com", "Test", "Test", "password");
+        UserInfoDto userInfo = new UserInfoDto("unexist@example.com", "Test", "Test", "password");
 
         when(userRepository.findByEmail(userInfo.getEmail())).thenReturn(null);
 
@@ -68,7 +68,7 @@ class UserServiceTest {
 
     @Test
     void createUser_userIsExist_throwsException() {
-        UserInfoDto userInfo = new UserInfoDto("existingUser@example.com", "password", "John", "Doe");
+        UserInfoDto userInfo = new UserInfoDto("exist@example.com", "Test", "Test", "password");
 
         when(userRepository.findByEmail(userInfo.getEmail())).thenReturn(new User());
 
