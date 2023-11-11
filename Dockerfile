@@ -9,7 +9,7 @@ COPY src /app/src
 
 RUN chmod +x mvnw
 
-RUN ./mvnw package -DskipTests
+RUN ./mvnw package spring-boot:repackage -DskipTests
 
 FROM eclipse-temurin:17-jdk-alpine
 WORKDIR /app
