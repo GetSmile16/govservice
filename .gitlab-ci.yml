@@ -16,9 +16,7 @@ build-job:       # This job runs in the build stage, which runs first.
   stage: build
   script:
     - echo "Build project"
-    - mvn compile package
-    - echo "Migrate DB"
-    - mvn flyway:migrate
+    - mvn package
 
 test-job:       # This job runs in the build stage, which runs first.
   stage: test
