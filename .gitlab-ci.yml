@@ -38,8 +38,6 @@ deploy-job:      # This job runs in the deploy stage.
     - docker-compose build
     - echo "Push project to registry"
     - docker push ${NAME}:${TAG}
-    - docker push postgres:latest
     - echo "Delete images"
     - docker rmi ${NAME}:${TAG}
-    - docker rmi postgres:latest
     - echo "Application successfully deployed."
