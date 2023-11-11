@@ -7,6 +7,8 @@ COPY mvnw .
 COPY pom.xml .
 COPY src /app/src
 
+RUN chmod +x mvnw
+
 RUN ./mvnw package -DskipTests
 
 FROM eclipse-temurin:17-jdk-alpine
