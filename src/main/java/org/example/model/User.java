@@ -49,6 +49,13 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
+    public User(String email, String firstName, String lastName, String patronymic) {
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.patronymic = patronymic;
+    }
+
     public Long getId() {
         return id;
     }

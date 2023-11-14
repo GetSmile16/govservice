@@ -110,6 +110,8 @@ public class UserServiceImpl implements UserService {
 
         emailUtil.sendEmailSuccess(savedProduct);
 
+
+        log.info("Provided season product \"" + product.getProductName() + "\"");
         return new UserProductDto(
                 savedProduct.getId(),
                 user.getEmail(),
@@ -137,6 +139,7 @@ public class UserServiceImpl implements UserService {
 
         UserProduct savedProduct = saveDoneProduct(user, product);
 
+        log.info("Provided product \"" + product.getProductName() + "\"");
         return new UserProductDto(
                 savedProduct.getId(),
                 user.getEmail(),
@@ -164,13 +167,16 @@ public class UserServiceImpl implements UserService {
     }
 
     private Product getProduct(User user, Long productId) {
-        if (userProductRepository.findUserProductByUserId(user.getId()) != null) {
+        Product product = productRepository.findProductById(productId);
+
+        List<UserProduct> userProducts = userProductRepository.findUserProductsByUserId(user.getId());
+
+        if (userProducts != null &&
+                userProducts.stream().anyMatch(up -> up.getProduct().equals(product))) {
             String message = messageSource.getMessage("product.is_done", null, Locale.getDefault());
             log.warn(message);
             throw new ProductIsDone(message);
         }
-
-        Product product = productRepository.findProductById(productId);
 
         if (product == null) {
             String message = messageSource.getMessage("product.not_found", null, Locale.getDefault());
@@ -185,6 +191,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public List<DoneProductDto> getAllProductsByUserOrderByDateDesc(String username) {
         List<UserProduct> products = userProductRepository.findUserProductsByUserEmailOrderByDateOfCreatedDesc(username);
+        log.info("Get all done products");
         return products.stream()
                 .map(o ->
                         new DoneProductDto(
@@ -208,6 +215,7 @@ public class UserServiceImpl implements UserService {
             throw new ProductNotFound(message);
         }
 
+        log.info("Get done product \"" + product.getProduct().getProductName() + "\"");
         return new UserProductDto(
                 id,
                 username,

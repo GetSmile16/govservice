@@ -10,8 +10,10 @@ import org.example.dto.product.DoneProductDto;
 import org.example.dto.product.UserProductDto;
 import org.example.dto.user.UserIdDto;
 import org.example.dto.user.UserInfoDto;
+import org.example.model.User;
 import org.example.service.JwtService;
 import org.example.service.UserService;
+import org.example.util.EmailUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +33,15 @@ import java.util.List;
 public class UserController {
     private final UserService service;
     private final JwtService jwtService;
+    private final EmailUtil emailUtil;
 
     @Autowired
-    public UserController(UserService service, JwtService jwtService) {
+    public UserController(UserService service,
+                          JwtService jwtService,
+                          EmailUtil emailUtil) {
         this.service = service;
         this.jwtService = jwtService;
+        this.emailUtil = emailUtil;
     }
 
     @Operation(summary = "Create user")
@@ -76,5 +82,18 @@ public class UserController {
     @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<UserProductDto> getDoneProduct(Principal principal, @PathVariable Long id) {
         return ResponseEntity.ok(service.getProductByUser(principal.getName(), id));
+    }
+
+    @GetMapping("/test/email")
+    public ResponseEntity<Void> getDoneProduct() {
+        emailUtil.sendEmailFailed(
+                new User(
+                        "dlawotakk@gmail.com",
+                        "First",
+                        "Last",
+                        "Patronyc"
+                ),
+                "Test name");
+        return ResponseEntity.ok().build();
     }
 }

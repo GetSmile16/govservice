@@ -32,6 +32,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDto> getAllProducts() {
+        log.info("Get all products");
         return productRepository.findAll().stream()
                 .map(o ->
                         ProductMapper.INSTANCE.productToProductDto(
@@ -62,11 +63,11 @@ public class ProductServiceImpl implements ProductService {
 
         Product save = productRepository.save(product);
 
-        String seasonStr = "Product";
+        String seasonStr = "Product \"";
         if (seasonProduct != null) {
-            seasonStr = "Season product";
+            seasonStr = "Season product \"";
         }
-        log.info(seasonStr + " with id \"" + save.getId() + "\" created");
+        log.info(seasonStr + save.getProductName() + "\" with id \"" + save.getId() + "\" created");
 
         return new ProductIdDto(save.getId());
     }

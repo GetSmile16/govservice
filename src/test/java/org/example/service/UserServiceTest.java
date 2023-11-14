@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.checkerframework.checker.units.qual.A;
 import org.example.dto.product.DoneProductDto;
 import org.example.dto.product.UserProductDto;
 import org.example.dto.user.UserIdDto;
@@ -106,8 +107,8 @@ class UserServiceTest {
         );
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(testUser);
-        when(userProductRepository.findUserProductByUserId(any(Long.class))).thenReturn(null);
         when(productRepository.findProductById(any(Long.class))).thenReturn(product);
+        when(userProductRepository.findUserProductsByUserId(any(Long.class))).thenReturn(null);
 
         User expectedUser = new User(ID, USERNAME);
 
@@ -143,8 +144,23 @@ class UserServiceTest {
     void provideSeasonProduct_isDone_throwsException() {
         User testUser = new User(ID, USERNAME);
 
+        Product product = new Product(
+                ID,
+                PRODUCT_NAME,
+                new SeasonProduct()
+        );
+
+        UserProduct userProduct = new UserProduct(
+                ID,
+                product
+        );
+
+        List<UserProduct> userProducts = new ArrayList<>();
+        userProducts.add(userProduct);
+
         when(userRepository.findByEmail(any(String.class))).thenReturn(testUser);
-        when(userProductRepository.findUserProductByUserId(any(Long.class))).thenReturn(new UserProduct());
+        when(productRepository.findProductById(any(Long.class))).thenReturn(product);
+        when(userProductRepository.findUserProductsByUserId(any(Long.class))).thenReturn(userProducts);
 
         assertThrows(ProductIsDone.class, () -> userService.provideSeasonProduct(USERNAME, ID));
 
@@ -156,8 +172,8 @@ class UserServiceTest {
         User testUser = new User(ID, USERNAME);
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(testUser);
-        when(userProductRepository.findUserProductByUserId(any(Long.class))).thenReturn(null);
         when(productRepository.findProductById(any(Long.class))).thenReturn(null);
+        when(userProductRepository.findUserProductsByUserId(any(Long.class))).thenReturn(null);
 
         assertThrows(ProductNotFound.class, () -> userService.provideSeasonProduct(USERNAME, ID));
 
@@ -175,8 +191,8 @@ class UserServiceTest {
         );
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(testUser);
-        when(userProductRepository.findUserProductByUserId(any(Long.class))).thenReturn(null);
         when(productRepository.findProductById(any(Long.class))).thenReturn(product);
+        when(userProductRepository.findUserProductsByUserId(any(Long.class))).thenReturn(null);
 
         assertThrows(ProductNotSeason.class, () -> userService.provideSeasonProduct(USERNAME, ID));
 
@@ -194,8 +210,9 @@ class UserServiceTest {
         );
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(testUser);
-        when(userProductRepository.findUserProductByUserId(any(Long.class))).thenReturn(null);
         when(productRepository.findProductById(any(Long.class))).thenReturn(product);
+        when(userProductRepository.findUserProductsByUserId(any(Long.class))).thenReturn(null);
+
 
         assertThrows(ProductIsOver.class, () -> userService.provideSeasonProduct(USERNAME, ID));
 
@@ -212,17 +229,19 @@ class UserServiceTest {
                 null
         );
 
+        UserProduct userProduct = new UserProduct(
+                ID,
+                product
+        );
+
         when(userRepository.findByEmail(any(String.class))).thenReturn(testUser);
-        when(userProductRepository.findUserProductByUserId(any(Long.class))).thenReturn(null);
         when(productRepository.findProductById(any(Long.class))).thenReturn(product);
+        when(userProductRepository.findUserProductsByUserId(any(Long.class))).thenReturn(null);
 
         User expectedUser = new User(ID, USERNAME);
 
         ArrayList<UserProduct> userProducts = new ArrayList<>();
-        userProducts.add(new UserProduct(
-                ID,
-                product
-        ));
+        userProducts.add(userProduct);
 
         expectedUser.setProducts(userProducts);
 
@@ -238,7 +257,7 @@ class UserServiceTest {
         verify(userRepository, times(1)).save(userCaptor.capture());
 
         User capturedUser = userCaptor.getValue();
-        UserProduct userProduct = capturedUser.getProducts().get(0);
+        userProduct = capturedUser.getProducts().get(0);
 
         assertEquals(product, userProduct.getProduct());
         assertEquals(ID, userProduct.getProduct().getId());
@@ -256,8 +275,8 @@ class UserServiceTest {
         );
 
         when(userRepository.findByEmail(any(String.class))).thenReturn(testUser);
-        when(userProductRepository.findUserProductByUserId(any(Long.class))).thenReturn(null);
         when(productRepository.findProductById(any(Long.class))).thenReturn(product);
+        when(userProductRepository.findUserProductsByUserId(any(Long.class))).thenReturn(null);
 
         assertThrows(ProductIsSeason.class, () -> userService.provideProduct(USERNAME, ID));
 
