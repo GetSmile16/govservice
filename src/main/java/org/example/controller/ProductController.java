@@ -34,7 +34,7 @@ public class ProductController {
 
     @Operation(summary = "Create new service. If field \"remainingTime\" isn't empty, then creates seasonal service")
     @PostMapping()
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<ProductIdDto> createProduct(@RequestBody NewProductDto newProductDto) {
         return ResponseEntity.ok(productService.addProduct(newProductDto));

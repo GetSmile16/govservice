@@ -14,6 +14,7 @@ import org.example.model.UserProduct;
 import org.example.repository.ProductRepository;
 import org.example.repository.UserProductRepository;
 import org.example.repository.UserRepository;
+import org.example.util.EmailUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -47,6 +48,8 @@ class UserServiceTest {
     private PasswordEncoder passwordEncoder;
     @Mock
     private MessageSource messageSource;
+    @Mock
+    private EmailUtil emailUtil;
     @Captor
     private ArgumentCaptor<User> userCaptor;
 

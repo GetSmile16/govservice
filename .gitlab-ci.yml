@@ -6,6 +6,8 @@ variables:
   POSTGRES_DB: servicedb
   NAME: ${CI_REGISTRY_IMAGE}
   TAG: ${CI_COMMIT_SHA}
+  SMTP_USERNAME: username
+  SMTP_PASSWORD: password
 
 stages:          # List of stages for jobs, and their order of execution
   - build

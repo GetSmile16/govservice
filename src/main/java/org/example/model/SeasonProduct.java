@@ -10,10 +10,6 @@ public class SeasonProduct {
     private Long id;
     private Integer remainingCount;
 
-    @OneToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
-
     public SeasonProduct() {
     }
 
@@ -36,13 +32,5 @@ public class SeasonProduct {
 
     public void setRemainingCount(Integer remainingCount) {
         this.remainingCount = remainingCount;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
     }
 }

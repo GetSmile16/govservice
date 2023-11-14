@@ -16,6 +16,7 @@ import org.example.model.enums.Role;
 import org.example.repository.ProductRepository;
 import org.example.repository.UserProductRepository;
 import org.example.repository.UserRepository;
+import org.example.util.EmailUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ public class UserServiceImpl implements UserService {
     private UserProductRepository userProductRepository;
     private PasswordEncoder encoder;
     private MessageSource messageSource;
+    private EmailUtil emailUtil;
 
     public UserServiceImpl() {
     }
@@ -45,12 +47,14 @@ public class UserServiceImpl implements UserService {
                            ProductRepository productRepository,
                            UserProductRepository userProductRepository,
                            PasswordEncoder passwordEncoder,
-                           MessageSource messageSource) {
+                           MessageSource messageSource,
+                           EmailUtil emailUtil) {
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.userProductRepository = userProductRepository;
         this.encoder = passwordEncoder;
         this.messageSource = messageSource;
+        this.emailUtil = emailUtil;
     }
 
     @Override
@@ -92,6 +96,9 @@ public class UserServiceImpl implements UserService {
         if (seasonProduct.getRemainingCount() == 0) {
             String message = messageSource.getMessage("product.is_over", null, Locale.getDefault());
             log.warn(message);
+
+            emailUtil.sendEmailFailed(user, product.getProductName());
+
             throw new ProductIsOver(message);
         }
 
@@ -100,6 +107,8 @@ public class UserServiceImpl implements UserService {
         );
 
         UserProduct savedProduct = saveDoneProduct(user, product);
+
+        emailUtil.sendEmailSuccess(savedProduct);
 
         return new UserProductDto(
                 savedProduct.getId(),
