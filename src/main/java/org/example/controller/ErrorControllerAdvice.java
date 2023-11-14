@@ -1,8 +1,12 @@
 package org.example.controller;
 
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.ValidationException;
-import org.example.exception.*;
+import org.example.exception.jwt.ExpiredToken;
+import org.example.exception.jwt.InvalidCreds;
+import org.example.exception.jwt.WrongToken;
+import org.example.exception.product.*;
+import org.example.exception.user.UserIsExist;
+import org.example.exception.user.UserNotFound;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -91,6 +95,31 @@ public class ErrorControllerAdvice extends ResponseEntityExceptionHandler {
         return handleCustomException(HttpStatus.NOT_FOUND, 5, ex);
     }
 
+    @ExceptionHandler(ProductNotFound.class)
+    public ResponseEntity<Map<String, Object>> handleProductNotFound(ProductNotFound ex) {
+        return handleCustomException(HttpStatus.NOT_FOUND, 6, ex);
+    }
+
+    @ExceptionHandler(ProductIsDone.class)
+    public ResponseEntity<Map<String, Object>> handleProductIsDone(ProductIsDone ex) {
+        return handleCustomException(HttpStatus.BAD_REQUEST, 7, ex);
+    }
+
+    @ExceptionHandler(ProductNotSeason.class)
+    public ResponseEntity<Map<String, Object>> handleProductNotSeason(ProductNotSeason ex) {
+        return handleCustomException(HttpStatus.BAD_REQUEST, 8, ex);
+    }
+
+    @ExceptionHandler(ProductIsSeason.class)
+    public ResponseEntity<Map<String, Object>> handleProductIsSeason(ProductIsSeason ex) {
+        return handleCustomException(HttpStatus.BAD_REQUEST, 9, ex);
+    }
+
+    @ExceptionHandler(ProductIsExist.class)
+    public ResponseEntity<Map<String, Object>> handleProductIsExist(ProductIsExist ex) {
+        return handleCustomException(HttpStatus.BAD_REQUEST, 10, ex);
+    }
+
     protected Map<String, Object> bodyError(int code, Exception exception) {
         Map<String, Object> map = new HashMap<>();
         map.put("code", code);
@@ -101,5 +130,10 @@ public class ErrorControllerAdvice extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Map<String, Object>> handleCustomException(HttpStatus status,
                                                                         int code, Exception exception) {
         return ResponseEntity.status(status).body(bodyError(code, exception));
+    }
+
+    @ExceptionHandler(ProductIsOver.class)
+    public ResponseEntity<String> handleProductIsOver(ProductIsOver ex) {
+        return ResponseEntity.ok(ex.getMessage());
     }
 }
