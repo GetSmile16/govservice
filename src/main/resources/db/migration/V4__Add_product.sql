@@ -1,5 +1,5 @@
 INSERT INTO season_products (id, remaining_count)
-VALUES (1, 0);
+VALUES (1, 10);
 
 SELECT setval('season_products_id_seq', 1);
 

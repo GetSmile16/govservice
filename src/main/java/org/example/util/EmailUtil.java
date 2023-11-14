@@ -1,87 +1,122 @@
 package org.example.util;
 
 import jakarta.mail.internet.MimeMessage;
+import org.example.model.EmailRetry;
 import org.example.model.User;
 import org.example.model.UserProduct;
-import org.example.service.ThymeleafService;
+import org.example.repository.EmailRetryRepository;
 import org.example.service.ThymeleafServiceImpl;
+import org.example.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.ResourceBundleMessageSource;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring5.SpringTemplateEngine;
-import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import org.thymeleaf.templateresolver.ITemplateResolver;
 
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
 public class EmailUtil {
-    private JavaMailSender emailSender;
-    private ThymeleafServiceImpl thymeleafService;
+    private final JavaMailSender emailSender;
+    private final ThymeleafServiceImpl thymeleafService;
+    private final EmailRetryRepository emailRetryRepository;
+    private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    public EmailUtil(JavaMailSender emailSender, ThymeleafServiceImpl thymeleafService) {
+    public EmailUtil(JavaMailSender emailSender,
+                     ThymeleafServiceImpl thymeleafService,
+                     EmailRetryRepository emailRetryRepository) {
         this.emailSender = emailSender;
         this.thymeleafService = thymeleafService;
+        this.emailRetryRepository = emailRetryRepository;
     }
 
     public void sendEmailSuccess(UserProduct userProduct) {
-        try {
-            MimeMessage message = emailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(
-                    message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
-                    StandardCharsets.UTF_8.name()
-            );
-
-            User user = userProduct.getUser();
-
-            helper.setTo(user.getEmail());
-            helper.setSubject("You successful provided service \"" + userProduct.getProduct().getProductName() + "\"");
-
-            Map<String, Object> variables = new HashMap<>();
-            String fullname = user.getLastName() + " " + user.getFirstName() + " " + user.getPatronymic();
-            variables.put("full_name", fullname);
-            variables.put("username", user.getUsername());
-            variables.put("product_name", userProduct.getProduct().getProductName());
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-            variables.put("date_created", sdf.format(Date.from(userProduct.getDateOfCreated().atZone(ZoneId.systemDefault()).toInstant())));
-            helper.setText(thymeleafService.createContent("success.html", variables), true);
-            emailSender.send(message);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        Map<String, Object> variables = new HashMap<>();
+        User user = userProduct.getUser();
+        String fullname = user.getLastName() + " " + user.getFirstName() + " " + user.getPatronymic();
+        variables.put("full_name", fullname);
+        variables.put("username", user.getUsername());
+        variables.put("product_name", userProduct.getProduct().getProductName());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        variables.put("date_created", sdf.format
+                (
+                        Date.from(userProduct.getDateOfCreated().atZone(ZoneId.systemDefault()).toInstant())
+                ));
+        String content = thymeleafService.createContent("success.html", variables);
+        String addressTo = user.getEmail();
+        String subject = "You successful provided service \"" + userProduct.getProduct().getProductName() + "\"";
+        sendEmail(content, addressTo, subject);
     }
 
     public void sendEmailFailed(User user, String productName) {
+        Map<String, Object> variables = new HashMap<>();
+        String fullname = user.getLastName() + " " + user.getFirstName() + " " + user.getPatronymic();
+        String text = fullname + ", unfortunalely, you provide this service too late.";
+        variables.put("text", text);
+        String content = thymeleafService.createContent("failed.html", variables);
+        String addressTo = user.getEmail();
+        String subject = "You failed to provide service \"" + productName + "\"";
+        sendEmail(content, addressTo, subject);
+    }
+
+    private void sendEmail(String content, String addressTo, String subject) {
         try {
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(
                     message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
                     StandardCharsets.UTF_8.name()
             );
-            helper.setTo(user.getEmail());
-            helper.setSubject("You failed to provide service \"" + productName + "\"");
-
-            Map<String, Object> variables = new HashMap<>();
-            String text = user.getLastName() + " " + user.getFirstName() + " " + user.getPatronymic() +
-                    ", unfortunalely, you provide this service too late.";
-            variables.put("text", text);
-            helper.setText(thymeleafService.createContent("failed.html", variables), true);
+            helper.setTo(addressTo);
+            helper.setSubject(subject);
+            helper.setText(content, true);
 
             emailSender.send(message);
-        }catch (Exception e){
-            e.printStackTrace();
+            log.info("Email send to " + addressTo);
+        } catch (Exception e) {
+            log.warn("Failed to send email to " + addressTo);
+            emailRetryRepository.save(
+                    new EmailRetry(
+                            addressTo,
+                            subject,
+                            content
+                    )
+            );
+        }
+    }
+
+    private void sendEmail(EmailRetry emailRetry) {
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(
+                    message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                    StandardCharsets.UTF_8.name()
+            );
+            helper.setTo(emailRetry.getAddressTo());
+            helper.setSubject(emailRetry.getSubject());
+            helper.setText(emailRetry.getContent(), true);
+
+            emailSender.send(message);
+            emailRetryRepository.deleteById(emailRetry.getId());
+            log.info("Email send to " + emailRetry.getAddressTo());
+        } catch (Exception e) {
+            log.warn("Retry failed to send email to " + emailRetry.getAddressTo());
+        }
+    }
+
+    @Scheduled(fixedDelay = 60000)
+    public void retryEmails() {
+        List<EmailRetry> failedEmails = emailRetryRepository.findAllByOrderByRetryTimeAsc();
+        for (EmailRetry emailRetry : failedEmails) {
+            sendEmail(emailRetry);
         }
     }
 }

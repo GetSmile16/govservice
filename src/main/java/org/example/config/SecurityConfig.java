@@ -36,7 +36,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("auth/register", "auth/generateToken").permitAll()
+                        .requestMatchers("auth/register", "auth/generateToken", "test/email").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/**").permitAll()
                         .anyRequest().authenticated()
                 )

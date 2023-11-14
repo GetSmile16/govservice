@@ -12,7 +12,7 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
 import java.util.Map;
 
 @Service
-public class ThymeleafServiceImpl implements ThymeleafService{
+public class ThymeleafServiceImpl implements ThymeleafService {
     private static final String MAIL_TEMPLATE_BASE_NAME = "mail/MailMessages";
 
     private static final String MAIL_TEMPLATE_PREFIX = "/templates/";
@@ -23,7 +23,7 @@ public class ThymeleafServiceImpl implements ThymeleafService{
 
     private static final TemplateEngine templateEngine;
 
-    static{
+    static {
         templateEngine = emailTemplateEngine();
     }
 

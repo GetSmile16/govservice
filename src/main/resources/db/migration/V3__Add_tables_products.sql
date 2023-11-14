@@ -6,9 +6,9 @@ CREATE TABLE season_products
 
 CREATE TABLE products
 (
-    id           SERIAL PRIMARY KEY NOT NULL,
-    product_name VARCHAR(1000)      NOT NULL,
-    season_product_id      BIGINT UNIQUE,
+    id                SERIAL PRIMARY KEY NOT NULL,
+    product_name      VARCHAR(1000)      NOT NULL,
+    season_product_id BIGINT UNIQUE,
     FOREIGN KEY (season_product_id) REFERENCES season_products (id)
 );
 
