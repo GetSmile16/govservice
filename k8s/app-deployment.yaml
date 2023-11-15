@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secret-registry
+  labels:
+    app: govservice
+type: kubernetes.io/basic-auth
+stringData:
+  username: GetSmile16
+  password: HFke5910
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: govservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: govservice
+  template:
+    metadata:
+      labels:
+        app: govservice
+    spec:
+      containers:
+      - name: app
+        image: registry.gitlab.com/fullstack-java/govservice:prod
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+        - name: SPRING_DATASOURCE_HOST
+          value: postgres-service
+        - name: SPRING_DATASOURCE_DB
+          value: servicedb
+        - name: SPRING_DATASOURCE_USER
+          value: postgres
+        - name: SPRING_DATASOURCE_PWD
+          value: postgres
+        - name: SPRING_MAIL_USERNAME
+          value: <username>
+        - name: SPRING_MAIL_PASSWORD
+          value: <password>
+        readinessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /actuator/health/readiness
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+      imagePullSecrets:
+      - name: secret-registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+spec:
+  selector:
+    app: govservice
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  type: ClusterIP
