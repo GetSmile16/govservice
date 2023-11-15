@@ -10,7 +10,6 @@ import org.example.dto.product.DoneProductDto;
 import org.example.dto.product.UserProductDto;
 import org.example.dto.user.UserIdDto;
 import org.example.dto.user.UserInfoDto;
-import org.example.model.User;
 import org.example.service.JwtService;
 import org.example.service.UserService;
 import org.example.util.EmailUtil;
@@ -84,16 +83,8 @@ public class UserController {
         return ResponseEntity.ok(service.getProductByUser(principal.getName(), id));
     }
 
-    @GetMapping("/test/email")
-    public ResponseEntity<Void> getDoneProduct() {
-        emailUtil.sendEmailFailed(
-                new User(
-                        "dlawotakk@gmail.com",
-                        "First",
-                        "Last",
-                        "Patronyc"
-                ),
-                "Test name");
-        return ResponseEntity.ok().build();
+    @PostMapping("/test/email")
+    public ResponseEntity<String> getDoneProduct(@RequestBody String recipientEmail) {
+        return ResponseEntity.ok(emailUtil.testSend(recipientEmail));
     }
 }

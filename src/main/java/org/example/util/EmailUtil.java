@@ -1,6 +1,7 @@
 package org.example.util;
 
 import jakarta.mail.internet.MimeMessage;
+import jakarta.validation.constraints.Email;
 import org.example.model.EmailRetry;
 import org.example.model.User;
 import org.example.model.UserProduct;
@@ -14,6 +15,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@Validated
 public class EmailUtil {
     private final JavaMailSender emailSender;
     private final ThymeleafServiceImpl thymeleafService;
@@ -118,5 +121,17 @@ public class EmailUtil {
         for (EmailRetry emailRetry : failedEmails) {
             sendEmail(emailRetry);
         }
+    }
+
+    public String testSend(@Email String addressTo) {
+        sendEmailFailed(
+                new User(
+                        addressTo,
+                        "First",
+                        "Last",
+                        "Patronyc"
+                ),
+                "Test name");
+        return "Email send to " + addressTo;
     }
 }
