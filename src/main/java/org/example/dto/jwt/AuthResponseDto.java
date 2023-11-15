@@ -1,4 +1,4 @@
-package org.example.dto;
+package org.example.dto.jwt;
 
 public class AuthResponseDto {
     private String token;

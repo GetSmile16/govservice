@@ -5,9 +5,7 @@ import org.example.model.enums.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -21,6 +19,8 @@ public class User implements UserDetails {
     private String firstName;
     @Column(nullable = false)
     private String lastName;
+    @Column(nullable = false)
+    private String patronymic;
     @Column(length = 1000)
     private String password;
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
@@ -28,16 +28,32 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user")
+    private List<UserProduct> userProducts = new ArrayList<>();
+
     public User() {
     }
 
-    public User(Long id, String email, String firstName, String lastName, String password, Set<Role> roles) {
+    public User(Long id, String email) {
+        this.id = id;
+        this.email = email;
+    }
+
+    public User(Long id, String email, String firstName, String lastName, String patronymic, String password, Set<Role> roles) {
         this.id = id;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.patronymic = patronymic;
         this.password = password;
         this.roles = roles;
+    }
+
+    public User(String email, String firstName, String lastName, String patronymic) {
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.patronymic = patronymic;
     }
 
     public Long getId() {
@@ -76,12 +92,28 @@ public class User implements UserDetails {
         this.lastName = lastName;
     }
 
+    public String getPatronymic() {
+        return patronymic;
+    }
+
+    public void setPatronymic(String patronymic) {
+        this.patronymic = patronymic;
+    }
+
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<UserProduct> getProducts() {
+        return userProducts;
+    }
+
+    public void setProducts(List<UserProduct> userProduct) {
+        this.userProducts = userProduct;
     }
 
     //security

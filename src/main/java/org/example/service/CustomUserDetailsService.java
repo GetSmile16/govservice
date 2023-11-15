@@ -1,6 +1,6 @@
 package org.example.service;
 
-import org.example.exception.UserNotFound;
+import org.example.exception.user.UserNotFound;
 import org.example.model.User;
 import org.example.repository.UserRepository;
 import org.slf4j.Logger;

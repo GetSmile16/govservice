@@ -1,11 +1,11 @@
 package org.example.service;
 
 import io.jsonwebtoken.Jwts;
-import org.example.dto.AuthRequestDto;
-import org.example.dto.AuthResponseDto;
-import org.example.exception.ExpiredToken;
-import org.example.exception.InvalidCreds;
-import org.example.exception.WrongToken;
+import org.example.dto.jwt.AuthRequestDto;
+import org.example.dto.jwt.AuthResponseDto;
+import org.example.exception.jwt.ExpiredToken;
+import org.example.exception.jwt.InvalidCreds;
+import org.example.exception.jwt.WrongToken;
 import org.example.model.enums.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
