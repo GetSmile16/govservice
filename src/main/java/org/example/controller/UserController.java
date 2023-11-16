@@ -2,6 +2,9 @@ package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.example.dto.jwt.AuthRequestDto;
@@ -45,24 +48,42 @@ public class UserController {
 
     @Operation(summary = "Create user")
     @PostMapping("auth/register")
+    @RequestBody(content = @Content(examples = {
+            @ExampleObject(
+                    summary = "New user",
+                    value =
+                            "{\"email\": \"example@mail.com\","
+                                    + "\"firstName\": \"first_name\"," +
+                                    "\"lastName\": \"last_name\"," +
+                                    "\"patronymic\": \"patronymic\"," +
+                                    "\"password\": \"pa$$w0rd\"" +
+                                    "}"),
+    }))
     public ResponseEntity<UserIdDto> addNewUser(@RequestBody UserInfoDto userInfo) {
         return ResponseEntity.ok(service.createUser(userInfo));
     }
 
     @Operation(summary = "Generate token for user with creds in body")
     @PostMapping("auth/generateToken")
+    @RequestBody(content = @Content(examples = {
+            @ExampleObject(
+                    summary = "User credentials",
+                    value =
+                            "{\"username\": \"example@mail.com\"," +
+                                    "\"password\": \"pa$$w0rd\"}"),
+    }))
     public ResponseEntity<AuthResponseDto> authenticateAndGetToken(@RequestBody AuthRequestDto authRequest) {
         return ResponseEntity.ok(jwtService.generateToken(authRequest));
     }
 
-    @Operation(summary = "Provide seasonal service for current user")
+    @Operation(summary = "Provide seasonal service by ID for current user")
     @PostMapping("user/services/season/{id}")
     @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<UserProductDto> provideSeasonProduct(Principal principal, @PathVariable Long id) {
         return ResponseEntity.ok(service.provideSeasonProduct(principal.getName(), id));
     }
 
-    @Operation(summary = "Provide common service for current user")
+    @Operation(summary = "Provide common service by ID for current user")
     @PostMapping("user/services/{id}")
     @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<UserProductDto> provideProduct(Principal principal, @PathVariable Long id) {
@@ -84,6 +105,12 @@ public class UserController {
     }
 
     @PostMapping("/test/email")
+    @Operation(summary = "Email to recipientEmail")
+    @RequestBody(content = @Content(examples = {
+            @ExampleObject(
+                    summary = "New user",
+                    value = "example@mail.com"
+            )}))
     public ResponseEntity<String> getDoneProduct(@RequestBody String recipientEmail) {
         return ResponseEntity.ok(emailUtil.testSend(recipientEmail));
     }

@@ -1,6 +1,5 @@
 package org.example.service;
 
-import org.checkerframework.checker.units.qual.A;
 import org.example.dto.product.DoneProductDto;
 import org.example.dto.product.UserProductDto;
 import org.example.dto.user.UserIdDto;

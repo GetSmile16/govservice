@@ -1,6 +1,8 @@
-# govservice
+# Government Service
 
+## Documentation
 
+You can see documentation [there](documentation/index.md).
 
 ## Getting started
 
