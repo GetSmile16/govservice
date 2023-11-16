@@ -1,0 +1,502 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+paths:
+  /user/services/{id}:
+    post:
+      tags:
+        - user-controller
+      summary: Provide common service by ID for current user
+      operationId: provideProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProductDto'
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ViolationArray'
+                  - $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - Bearer Authentication: []
+  /user/services/season/{id}:
+    post:
+      tags:
+        - user-controller
+      summary: Provide seasonal service by ID for current user
+      operationId: provideSeasonProduct
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProductDto'
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ViolationArray'
+                  - $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - Bearer Authentication: []
+  /test/email:
+    post:
+      tags:
+        - user-controller
+      summary: Email to recipientEmail
+      operationId: getDoneProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+            example: example@mail.com
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: string
+  /products:
+    get:
+      tags:
+        - product-controller
+      summary: Get all available services
+      operationId: getProducts
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDto'
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ViolationArray'
+                  - $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - Bearer Authentication: []
+    post:
+      tags:
+        - product-controller
+      summary: "Create new service. If field \"remainingTime\" isn't empty, then creates\
+        \ seasonal service"
+      operationId: createProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProductDto'
+            examples:
+              sample1:
+                value:
+                  productName: Test name
+                  remainingCount: 10
+              sample2:
+                value:
+                  productName: example@mail.com
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductIdDto'
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ViolationArray'
+                  - $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - Bearer Authentication: []
+  /auth/register:
+    post:
+      tags:
+        - user-controller
+      summary: Create user
+      operationId: addNewUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInfoDto'
+            example:
+              email: example@mail.com
+              firstName: first_name
+              lastName: last_name
+              patronymic: patronymic
+              password: pa$$w0rd
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserIdDto'
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ViolationArray'
+                  - $ref: '#/components/schemas/Error'
+  /auth/generateToken:
+    post:
+      tags:
+        - user-controller
+      summary: Generate token for user with creds in body
+      operationId: authenticateAndGetToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequestDto'
+            example:
+              username: example@mail.com
+              password: pa$$w0rd
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponseDto'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /user/services/done:
+    get:
+      tags:
+        - user-controller
+      summary: Get completed services. Field "season" indicates that the service is
+        seasonal
+      operationId: getDoneProducts
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DoneProductDto'
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ViolationArray'
+                  - $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: Forbidden
+      security:
+        - Bearer Authentication: []
+  /user/services/done/{id}:
+    get:
+      tags:
+        - user-controller
+      summary: Get completed service by ID. Field "season" indicates that the service
+        is seasonal
+      operationId: getDoneProduct_1
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProductDto'
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ViolationArray'
+                  - $ref: '#/components/schemas/Error'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+        "403":
+          description: Forbidden
+        "404":
+          description: Not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - Bearer Authentication: []
+components:
+  schemas:
+    ViolationArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/Violation'
+    Violation:
+      type: object
+      properties:
+        fieldName:
+          type: string
+          description: Validate error field
+        message:
+          type: string
+          description: Error message describing the violation
+    Error:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Error code
+          format: int32
+        message:
+          type: string
+          description: Error message
+    UserProductDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Id of created service
+        email:
+          type: string
+          description: Email of user in created service
+        firstName:
+          type: string
+          description: First name of user in created service
+        lastName:
+          type: string
+          description: Last name of user in created service
+        patronymic:
+          type: string
+          description: Patronymic of user in created service
+        productName:
+          type: string
+          description: Service name in created service
+        dateOfCreated:
+          type: string
+          format: date-time
+          description: Created date of created service
+        season:
+          type: boolean
+          description: Is service seasonal
+    NewProductDto:
+      required:
+        - productName
+      type: object
+      properties:
+        productName:
+          type: string
+          description: Service name of new service
+        remainingCount:
+          type: integer
+          format: int32
+          description: Limit of new service
+    ProductIdDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Id of created service
+    UserInfoDto:
+      required:
+        - firstName
+        - lastName
+        - password
+        - patronymic
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email of new user
+        firstName:
+          type: string
+          description: First name of new user
+        lastName:
+          type: string
+          description: Last name of new user
+        patronymic:
+          type: string
+          description: Patronymic of new user
+        password:
+          maxLength: 15
+          minLength: 4
+          type: string
+          description: Password of new user
+    UserIdDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Id of created user
+    AuthRequestDto:
+      required:
+        - password
+        - username
+      type: object
+      properties:
+        username:
+          type: string
+          description: Username of user
+        password:
+          maxLength: 15
+          minLength: 4
+          type: string
+          description: Password of user
+    AuthResponseDto:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Generated token
+    DoneProductDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Id of created service
+        dateOfCreated:
+          type: string
+          format: date-time
+          description: Created date of created service
+        productName:
+          type: string
+          description: Name of created service
+        season:
+          type: boolean
+          description: Is service seasonal
+    ProductDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Id of available service
+        productName:
+          type: string
+          description: Name of available service
+        season:
+          type: boolean
+          description: Is service seasonal
+  securitySchemes:
+    Bearer Authentication:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
