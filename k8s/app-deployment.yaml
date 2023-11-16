@@ -6,8 +6,8 @@ metadata:
     app: govservice
 type: kubernetes.io/basic-auth
 stringData:
-  username: GetSmile16
-  password: HFke5910
+  username: <username>
+  password: <password>
 ---
 apiVersion: apps/v1
 kind: Deployment
